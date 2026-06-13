@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentguard"
+version = "0.1.0"
+description = "A defense-in-depth action firewall for tool-using agents, with a model-internal intent brake that closes the model-origin blind spot."
+authors = [{ name = "Caio Vicentino", email = "caio@openinterp.org" }]
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+ground = ["huggingface_hub"]   # only needed to re-verify L2 efficacy against the live HF ledgers
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://openinterp.org/agentguard"
+Paper = "https://doi.org/10.5281/zenodo.20679287"
+
+[tool.setuptools.packages.find]
+include = ["agentguard*"]
+
+[tool.setuptools.package-data]
+agentguard = ["data/*.json"]
