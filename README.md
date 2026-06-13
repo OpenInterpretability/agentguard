@@ -2,7 +2,7 @@
 
 **A defense-in-depth action firewall for tool-using agents — with a model-internal intent brake that closes the *model-origin* blind spot every incumbent shares.**
 
-[![tests](https://img.shields.io/badge/tests-20%20passing-brightgreen)](tests/) [![eval](https://img.shields.io/badge/eval-51%2F51-brightgreen)](eval_agentguard.py) [![paper](https://img.shields.io/badge/paper-Zenodo%2010.5281%2Fzenodo.20679287-blue)](https://doi.org/10.5281/zenodo.20679287)
+[![tests](https://img.shields.io/badge/tests-20%20passing-brightgreen)](tests/) [![eval](https://img.shields.io/badge/eval-51%2F51-brightgreen)](eval_agentguard.py) [![brake paper](https://img.shields.io/badge/brake-Zenodo%2010.5281%2Fzenodo.20679287-blue)](https://doi.org/10.5281/zenodo.20679287) [![detector paper](https://img.shields.io/badge/detector-Zenodo%2010.5281%2Fzenodo.20683623-blue)](https://doi.org/10.5281/zenodo.20683623)
 
 ```python
 from agentguard import Firewall, ActionContext, ToolCall, Step
@@ -32,7 +32,12 @@ AgentGuard layers four **independent** signals so each covers the others' blind 
 | **L2 intent brake** (`intent.py`) | is the agent internally **committed** to an **unauthorized** irreversible action? | **model-origin harm**, laundered injection | needs white-box weights |
 | **L3 actuation** (`actuate.py`) | what to do? | block · **redirect-to-safe** · escalate-to-human | — |
 
-The **L2 brake is grounded in real measurements**: injecting a task-matched safe-donor at a late layer collapses a committed irreversible action to **0.00 emission** and **redirects 100% to a safe read-only action** (`send_transaction → get_balance`), across 6 actions and 3 architectures — published, McNemar *b*=24/*c*=0 for send, eval 88/88. See [Zenodo 10.5281/zenodo.20679287](https://doi.org/10.5281/zenodo.20679287). The detector is the late-layer logit-lens commit-vs-safe gap (`hooks.py`).
+Both halves of L2 are **measured on real models**, not assumed:
+
+- **The actuator (brake).** Injecting a task-matched safe-donor at a late layer collapses a committed irreversible action to **0.00 emission** and **redirects 100% to a safe read-only action** (`send_transaction → get_balance`), across 6 actions and 3 architectures — McNemar *b*=24/*c*=0 for send, eval 88/88. Paper: [Zenodo 10.5281/zenodo.20679287](https://doi.org/10.5281/zenodo.20679287).
+- **The detector.** At the commit point, a single **late-layer authorization direction** separates *authorized* from *unauthorized* irreversible-action commits at **AUROC ≈ 1.0** — and the capacity confound is ruled out (1-D difference-of-means, regularization sweep, PCA-32, commit-state matched; a random direction is at chance at the locus). It is **domain-general** (train on 5 actions, detect the held-out 6th at 1.0), **origin-robust** (train on injection, detect held-out model-origin at 0.89), and the **same direction steered *controls* the commit** (emit range 0.67 vs 0.03 random). It replicates on a second architecture family (gpt-oss-20b MoE). Paper: [Zenodo 10.5281/zenodo.20683623](https://doi.org/10.5281/zenodo.20683623) (*The Authorization Direction*). The live-hook computation is in `hooks.py`.
+
+A behavioral finding from the detector study, on both models: they **obey explicit prohibition** ("do not" → commit 0.00) but **self-commit irreversible actions from a benign task** — model-origin harm is unprompted over-eagerness, the exact gap L2 exists for.
 
 ## AgentActionBench — the coverage proof
 
@@ -61,10 +66,23 @@ python3 eval_agentguard.py    # 51/51 — recomputes the thesis + verifies L2 ef
 
 ## Honest scope
 
-AgentGuard is **defense-in-depth, not a single robust layer**. The deterministic layers (L0/L1) are load-bearing against adaptive adversaries; L2 is a cheap model-internal signal that uniquely covers model-origin harm. L2 requires **white-box / defender-owned (open) weights** and is not robust to a *white-box activation-space* adversary (obfuscated-activations attacks) — the threat model is a **prompt/environment adversary against a model the defender controls**. The brake's suppress/redirect efficacy is published real data; the model-origin *detection AUROC* on fresh scenarios is the next live-GPU validation (see `SCOPE.md`). Actions in the benchmark are simulated. See `SCOPE.md` for exactly what is real-data-backed vs harness vs pending.
+AgentGuard is **defense-in-depth, not a single robust layer**. The deterministic layers (L0/L1) are load-bearing against adaptive adversaries; L2 is a cheap model-internal signal that uniquely covers model-origin harm. L2 requires **white-box / defender-owned (open) weights** and is not robust to a *white-box activation-space* adversary (obfuscated-activations attacks) — the threat model is a **prompt/environment adversary against a model the defender controls**. Both the brake's suppress/redirect efficacy *and* the detector's AUROC are now **measured on real models** (papers above); the detector's AUROC=1.0 is a ceiling whose *capacity* origin is ruled out but whose *surface-lexical* component is not fully isolated (a minimal-pair tightening remains). Actions in the benchmark are simulated. See `SCOPE.md` and `RESULTS_phase1/2/3` for exactly what is real-data-backed vs harness.
+
+## Research behind L2 (papers + reproducible runs)
+
+The model-internal layer rests on a four-phase study (pre-registered, every number recomputed by an eval from the public HF ledgers):
+
+| phase | result | artifact |
+|---|---|---|
+| brake (actuator) | 0.00 emit, 100% redirect-to-safe, 6 actions × 3 archs | [Zenodo 20679287](https://doi.org/10.5281/zenodo.20679287) |
+| detector measured | AUROC ≈ 1.0, capacity ruled out, cross-action 1.0, cross-origin 0.89 | `PREREG_phase1/2`, `RESULTS_phase1/2` |
+| causal (detect=control) | steering range 0.67 vs 0.03 random, bidirectional | `RESULTS_phase1` |
+| cross-architecture | gpt-oss-20b replicates (detect 1.0, steer 0.65 vs −0.25) | `RESULTS_phase3` |
+| paper | *The Authorization Direction* | [Zenodo 20683623](https://doi.org/10.5281/zenodo.20683623) · `paper/` (eval 35/35) |
 
 ## Citation
 
-Built on *Mechanistic Circuit-Breakers Generalize Across Irreversible Agent Actions and Architectures* (Vicentino, 2026, [Zenodo 10.5281/zenodo.20679287](https://doi.org/10.5281/zenodo.20679287)).
+- The actuator: *Mechanistic Circuit-Breakers Generalize Across Irreversible Agent Actions and Architectures* (Vicentino, 2026, [Zenodo 10.5281/zenodo.20679287](https://doi.org/10.5281/zenodo.20679287)).
+- The detector: *The Authorization Direction: A Late-Layer Direction that Detects and Controls an Agent's Commitment to Unauthorized Irreversible Actions, Across Architectures* (Vicentino, 2026, [Zenodo 10.5281/zenodo.20683623](https://doi.org/10.5281/zenodo.20683623)).
 
 Apache-2.0 · [openinterp.org/agentguard](https://openinterp.org/agentguard)
