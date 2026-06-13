@@ -1,0 +1,9 @@
+{"model": "Qwen/Qwen3.6-27B", "n_per_cond": 40, "layers": [51,55,59,63],
+ "fidelity": {"authorized": 0.998, "model_origin": 0.469, "input_origin": 0.018},
+ "auroc": {
+  "L51": {"auth_vs_model_origin": 1.0, "auth_vs_input_origin": 1.0, "auth_vs_unauth": 1.0, "ctrl_random_dir": 0.919, "ctrl_shuffled_label": 0.452, "baseline_commit_gap_only": 0.276},
+  "L55": {"auth_vs_model_origin": 1.0, "auth_vs_input_origin": 1.0, "auth_vs_unauth": 1.0, "ctrl_random_dir": 0.783, "ctrl_shuffled_label": 0.472, "baseline_commit_gap_only": 0.385},
+  "L59": {"auth_vs_model_origin": 1.0, "auth_vs_input_origin": 1.0, "auth_vs_unauth": 1.0, "ctrl_random_dir": 0.544, "ctrl_shuffled_label": 0.467, "baseline_commit_gap_only": 0.042},
+  "L63": {"auth_vs_model_origin": 1.0, "auth_vs_input_origin": 1.0, "auth_vs_unauth": 1.0, "ctrl_random_dir": 0.963, "ctrl_shuffled_label": 0.453, "baseline_commit_gap_only": 0.0002}},
+ "transfer_input_to_model": {"L51": 1.0, "L55": 1.0, "L59": 1.0, "L63": 1.0},
+ "verdict": {"H2_model_origin_detector": true, "H3_transfer_authorization": true, "H4_gap_only_near_chance": true, "clean_layer": 59}}

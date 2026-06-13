@@ -24,13 +24,19 @@ state exactly what is measured, what is constructed, and what is the next valida
 - **L0/L1/L3 and the text-guard baseline** — real, deterministic implementations; their
   catch/blind behavior on the benchmark is computed, not assumed.
 
+## Measured (pilot, 2026-06-13) — was pending, now run
+1. **Model-origin detection AUROC — MEASURED (Qwen3.6-27B, n=40, Colab G4).** A linear probe on the
+   late-layer residual at the commit point separates authorized from unauthorized (incl.
+   **model-origin**) irreversible commits, and the direction **generalizes across attack origin**
+   (train injection → test model-origin, AUROC 1.00 — the H3 confound killer). Not the commit gap
+   (H4: gap-only AUROC ≈0.04–0.38), not a label artifact (shuffled ≈0.46). **Defensible locus = L59**,
+   where the random-direction control is at chance (0.54) while the trained probe is 1.00; at
+   L51/L63 the random-dir control is 0.92–0.96, so separation there is partly trivial. AUROC=1.00 is
+   a **pilot ceiling** (n=40, one domain) that will drop with harder negatives and scale. Full
+   analysis: `RESULTS_phase0_detector.md`; ledger on HF. → L2 is now *measured*, not just
+   harness-grounded (seed of paper #9).
+
 ## Pending (the next live validations — NOT claimed as done)
-1. **Model-origin detection AUROC (live GPU).** The brake's *suppress+redirect* is published-real;
-   what a live run adds is the **detector's discrimination** between (a) a legitimately authorized
-   irreversible commit and (b) a model-origin / injected unauthorized commit, on fresh Qwen
-   activations — i.e., does the late-layer signal separate "authorized" from "self-committed
-   unauthorized" with high AUROC? This is the Phase-0 wedge experiment. Harness is ready
-   (`hooks.LiveCommitProbe`); only the GPU run is pending.
 2. **Real (non-simulated) tool execution** in a sandbox, with the firewall intercepting the
    actual dispatch + latency numbers.
 3. **Adaptive prompt-only red-team** against the full stack (the realistic threat model).
