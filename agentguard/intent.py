@@ -18,10 +18,19 @@ for model-origin, provenance is clean (L1 blind) and parameters are policy-compl
 internal commitment + the authorization mismatch.
 
 Honest scope: the BRAKE efficacy (suppress->0.00, redirect->safe) is published real data.
-The detector's commitment signal is real published data per action. Operationally, the
-authorization-consistency check here is computed from the transcript; the deployable
-version reads it from the model's internal task representation via the same late-layer
-hook (Phase-3 live-hook interface). White-box: requires defender-owned / open weights.
+The detector's commitment signal (gap_l59) is real published data per action. White-box:
+requires defender-owned / open weights.
+
+AUTHORIZATION SOURCING (corrected per paper #10 / H1, DOI 10.5281/zenodo.20685264). `ctx.authorized`
+is the granted-vs-felt judgment: did the TRUSTED task actually authorize THIS action. It MUST be
+sourced from an EXTERNAL, task-grounded check (the judge / L3 against the explicit user request), NOT
+from the model's internal task representation. #10 showed the model's internal authorization signal is
+"felt, not granted": under a realistic model-origin judgment error (the agent finishes a cleanup plan it
+co-authored under a vague "go ahead"), the internal probe reports "authorized" (felt) and is operationally
+blind; H1 showed steering -d does not recover control there either. So the internal signal tells us the
+agent is COMMITTED (gap_l59) — but whether the commit is GRANTED must come from outside the model.
+Feeding `ctx.authorized` from the internal probe makes the firewall inherit the model's mistake (H5:
+0/21 caught); feeding it from the external judge catches 21/21 at FP 0/12. See tests/test_h5_felt_authorized.py.
 """
 from __future__ import annotations
 
