@@ -66,7 +66,7 @@ ck("tex unauth mean 11.87", intex("$11.87$")); ck("tex auth mean 15.17", intex("
 # 6. AUROC
 ap=auroc(au_s,un_s); ck("AUROC probe 0.90", near(ap,0.897,0.005), ap); ck("AUROC probe in verdict 0.897", near(V5["verdict"]["auroc_probe_auth_vs_realunauth"],0.897,0.001))
 aj=auroc([1.0 if r["judge_allow"] else 0.0 for r in au],[1.0 if r["judge_allow"] else 0.0 for r in un]); ck("AUROC judge 1.0", aj==1.0, aj)
-ck("tex AUROC 0.90", intex("AUROC $0.90$")); ck("tex AUROC 1.0 judge", intex("AUROC $1.0$"))
+ck("tex AUROC 0.897 (precise, 3x)", TEX.count("0.897")>=3); ck("tex AUROC 1.0 judge", intex("AUROC $1.0$"))
 ck("overlap: max unauth > min auth", max(un_s)>min(au_s))
 
 # 7. design counts

@@ -62,7 +62,7 @@ ax.set_ylabel("authorization-direction projection  $r\\cdot d$"); ax.set_ylim(-4
 ax.legend(fontsize=7.6,loc="lower center")
 ax.set_title("The realistic unauthorized deletes project onto the AUTHORIZED side of the direction\n"
              "(both clusters sit far above the honestly-set threshold; the probe cannot tell them apart\n"
-             f"operationally — AUROC {V5['verdict']['auroc_probe_auth_vs_realunauth']:.2f}, but overlapping and both 'allowed')",fontsize=9)
+             f"operationally — AUROC {V5['verdict']['auroc_probe_auth_vs_realunauth']:.3f}, but overlapping and both 'allowed')",fontsize=9)
 fig.tight_layout(); fig.savefig(os.path.join(OUT,"fig2_distribution.pdf")); plt.close(fig)
 
 # ---------- Fig 3: probe vs external judge on the elicited unauthorized set ----------

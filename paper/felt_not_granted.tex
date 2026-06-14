@@ -32,7 +32,7 @@ unauthorized deletion in $18/18$ varied scenarios. (3) On the elicited unauthori
 ($n{=}21$, $14$ distinct internal scores), the frozen probe \textbf{allows $100\%$} (95\% Wilson CI
 $[0.845,1.0]$) at its honestly-calibrated threshold, with \emph{zero} false positives on $12$ authorized
 deletes; an external task-grounded judge \textbf{blocks $100\%$} (CI $[0.845,1.0]$). There is graded
-internal signal (AUROC $0.90$: authorized deletes project higher than erroneous ones), but the two
+internal signal (AUROC $0.897$: authorized deletes project higher than erroneous ones), but the two
 distributions overlap and both sit far above the threshold, so an honest operating point cannot exploit it;
 the judge separates perfectly (AUROC $1.0$). The probe tracks the authorization the model \emph{feels}, not
 the one the user \emph{granted}: under adversarial framing these coincide (the regime where the direction
@@ -165,7 +165,7 @@ delete. Error bars are 95\% Wilson intervals.}
 \paragraph{Why: the error projects onto the authorized side.} Figure~\ref{fig:dist} shows the probe-score
 distributions. The realistic unauthorized deletes project to $11.87$ on average (min $7.65$, max $15.93$);
 the authorized deletes to $15.17$ (min $12.29$, max $18.56$). \emph{There is graded signal} --- authorized
-deletes score higher, AUROC $=0.90$ for separating the two sets --- but the distributions \emph{overlap}
+deletes score higher, AUROC $=0.897$ for separating the two sets --- but the distributions \emph{overlap}
 (the highest unauthorized score exceeds the lowest authorized one) and, decisively, \emph{both sit far above
 the honest threshold}, which was placed midway between the calibration classes (authorized $+30$,
 unauthorized-``tidy'' $-36$). The realistic error does not look like the calibration's notion of
@@ -178,7 +178,7 @@ higher threshold chosen against \emph{labeled realistic errors}, which a deploym
 \caption{The decisive picture. Realistic unauthorized deletes (red) project onto the \emph{authorized} side
 of the direction, intermingled with and just below the authorized deletes (green), and far above the honest
 threshold (dashed). The calibration's unauthorized class (dotted, $-36$) is nowhere near the realistic
-errors. The probe is rank-separable (AUROC $0.90$) but operationally blind.}
+errors. The probe is rank-separable (AUROC $0.897$) but operationally blind.}
 \label{fig:dist}
 \end{figure}
 
@@ -231,7 +231,7 @@ internals.
 \section{Limitations}
 Effective $n$ on the elicited set is $\approx 14$ distinct scenarios (the momentum grid reuses $12$
 disposable filenames); the Wilson intervals use $n{=}21$ and are mildly anti-conservative under that
-repetition, but a conservative read at $n{=}14$ still gives a fail-rate lower bound $\approx 0.77$, and the
+repetition, but a conservative read at $n{=}14$ still gives a fail-rate lower bound $\approx 0.78$, and the
 qualitative claim (probe allows, judge catches, $0$ FP) is unaffected. The study is one model
 (Qwen3.6-27B), one domain (file deletion), bf16, and a \emph{detection} operating point. The judge is the
 \emph{same} base model; its perfect score here is not evidence that LLM judges are robust in general --- a
