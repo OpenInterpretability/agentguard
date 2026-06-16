@@ -24,7 +24,8 @@ ck("sup cross A2B 0.764", near(CF["supervised_cross_A2B"],0.764)); ck("sup cross
 ck("pooled 0.998", near(CF["pooled_best_auroc"],0.998)); ck("pooled p 0", CF["pooled_perm_p"]==0.0)
 ck("pooled feat 34355", CF["pooled_best_feature"]==34355)
 ck("featA 1574", CF["selected_feat_A"]==1574); ck("featB 10017", CF["selected_feat_B"]==10017)
-ck("tex A2B 0.50", intex("A$\\to$B $0.50$")); ck("tex B2A 0.99", intex("B$\\to$A $0.99$"))
+ck("tex A2B 0.50", intex("A$\\to$B $0.50$")); ck("tex B2A 0.993 (exact)", intex("B$\\to$A $0.993$"))
+ck("tex 5 new cites present", all(c in TEX for c in ["controltasks","saeeval","nonlinear","shortcut","scalingmono"]))
 ck("tex pooled 0.998", intex("$0.998$")); ck("tex featA 34355", intex("34355"))
 
 # 3. naming = surface form (not authorization)

@@ -1,4 +1,4 @@
-# EVAL — Form, Not Granted (33/33 numeric checks PASS)
+# EVAL — Form, Not Granted (34/34 numeric checks PASS)
 
 Recomputed from the 4 SAE ledgers by `eval_commit_ontology.py`.
 
@@ -19,7 +19,8 @@ Recomputed from the 4 SAE ledgers by `eval_commit_ontology.py`.
 - PASS — featA 1574
 - PASS — featB 10017
 - PASS — tex A2B 0.50
-- PASS — tex B2A 0.99
+- PASS — tex B2A 0.993 (exact)
+- PASS — tex 5 new cites present
 - PASS — tex pooled 0.998
 - PASS — tex featA 34355
 - PASS — naming 34355 = format boilerplate
@@ -36,13 +37,13 @@ Recomputed from the 4 SAE ledgers by `eval_commit_ontology.py`.
 - PASS — tex qualifies not refutes
 - PASS — tex absence caveat
 
----
-## Pre-mint eval (3 layers) — 0 blockers
-- **Numeric:** 33/33 PASS (above) — every number recomputed from the 4 SAE ledgers.
-- **Citations:** 5/5 external web-verified (Bricken/Towards-Monosemanticity, Cunningham 2309.08600,
-  Gao 2406.04093 TopK, Marks&Tegmark 2310.06824, Bolukbasi 2104.07143; refusaldir 2406.11717 verified prior),
-  0 fabrications; 2 self-cites are published arc DOIs (authdir 20683623, feltnotgranted 20685264).
-- **Reproducibility:** the decisive counterfactual run reproduced bit-for-bit across two GPU sessions
-  (crossA2B 0.50, crossB2A 0.993, pooled 0.998, feats 34355/1574/10017 — verified in the session log).
-- **Honest scope present:** qualifies-not-refutes #9/#10; FVE 0.66; absence-of-evidence caveat; one
-  model/locus/domain; steering-control not re-tested.
+## Final pre-mint eval (3 layers) — 0 blockers
+- **Numeric:** recompute from 4 ledgers, all PASS.
+- **Citations:** 13 total. 10 external web-verified (refusaldir, monosemantic, saefind, topk, geometry,
+  interpillusion + the 5 added: controltasks/Hewitt-Liang, saeeval/Makelov-Lange-Nanda, nonlinear/Engels,
+  shortcut/Geirhos, scalingmono/Templeton), 0 fabrications; 2 self-cite published arc DOIs.
+- **Adversarial prose audit (agent):** 0 BLOCKERS, 3 MINOR — all fixed: (1) B→A 0.99→0.993 (exact ledger);
+  (2) clarified #10017 as "the B→A transferring feature" not loosely "invariant"; (3) the "1000×" permutation
+  count is hardcoded in the runners (`agentguard_sae_{counterfactual,autopsy}.py`, `for _ in range(1000)`),
+  reproducible. Auditor confirmed H_0 hedged correctly, qualifies-not-refutes consistent, FVE/absence-of-
+  evidence caveats present, flip is selection-free, verdict_native flag debunked, em-dash self-correction stated.

@@ -32,7 +32,7 @@ the final user turn varies --- a direction measuring authorization would not fli
 feature that separates granted from felt is, by its max-activating context, a tool-call scaffold, a JSON
 tool-schema token, or the file-listing output --- never a semantic ``user granted this'' feature. (3) \textbf{A
 cross-lexical-family test isolates this}: a feature selected on one paraphrase family does \emph{not} transfer
-to a disjoint family (held-out AUROC $0.50$, chance), and the one feature that does transfer ($0.99$, pooled
+to a disjoint family (held-out AUROC $0.50$, chance), and the one feature that does transfer ($0.993$, pooled
 $0.998$) max-activates on tool-call \emph{format boilerplate}, not authorization. The agent's commit-point
 representation is dominated by \textbf{surface form and plan-coherence}; \emph{authorization-as-granted is not
 a native monosemantic feature} at this locus. Internal authorization monitors fail not because they are
@@ -51,12 +51,12 @@ authorization the model \emph{feels} (and is blind to the user's actual grant)~\
 Every step of that arc used a \emph{supervised} difference-of-means direction $d=\overline{\text{auth}}
 -\overline{\text{unauth}}$. This method has a known failure mode: it \emph{always} returns a direction that
 separates the labeled sets, whether the model represents the concept monosemantically or whether we merely
-projected a human concept onto whatever variance correlated with the labels~\cite{geometry,interpillusion}.
+projected a human concept onto whatever variance correlated with the labels~\cite{geometry,interpillusion}. A probe can fit a label from spurious structure unless tested against a control~\cite{controltasks}.
 The ``felt, not granted'' result is itself a hint that the concept is imported. So we ask the question the
 ruler cannot answer: at the moment an agent commits an irreversible action, does it \emph{represent}
 ``user-granted authorization'' in its own ontology --- or is the decision substrate something else, onto which
 ``authorization'' was projected? We answer it by letting the model's own features speak, via a sparse
-autoencoder~\cite{monosemantic,saefind,topk} trained on this exact model.
+autoencoder~\cite{monosemantic,saefind,topk,scalingmono} trained on this exact model.
 
 Contributions: (i) a structure-matched control shows the supervised ``authorization direction'' is
 \emph{confounded by conversation structure} --- it does not weaken but \emph{inverts} (\S\ref{sec:flip}); (ii)
@@ -136,16 +136,16 @@ family A, fix its polarity, and evaluate on the held-out family B, and B$\to$A (
 \begin{center}
 \begin{tabular}{lcc}\toprule
  & within-family (selection-inflated) & \textbf{cross-family (held out)} \\\midrule
-best SAE feature & A $1.0$, B $1.0$ & \textbf{A$\to$B $0.50$}, B$\to$A $0.99$ \\
+best SAE feature & A $1.0$, B $1.0$ & \textbf{A$\to$B $0.50$}, B$\to$A $0.993$ \\
 supervised $d$ (on cells) & A $1.0$, B $0.99$ & A$\to$B $0.76$, B$\to$A $1.0$ \\\bottomrule
 \end{tabular}
 \end{center}
 
 The A-selected feature \emph{does not transfer} (A$\to$B $=0.50$, chance): it read a lexical shortcut present
-only in family A (the filename, ``delete'', ``authorize''). A feature \emph{does} transfer B$\to$A ($0.99$), and
+only in family A (the filename, ``delete'', ``authorize''). A feature \emph{does} transfer B$\to$A ($0.993$), and
 a pooled feature separates granted from felt across both families (AUROC $0.998$, $p<0.001$) --- which, taken
 alone, looks like a paraphrase-invariant semantic signal. \textbf{Naming settles it}: those ``invariant''
-features (\#34355, \#10017) max-activate on tool-call \emph{format boilerplate}
+features --- \#34355 (the pooled feature) and \#10017 (the B$\to$A transferring feature) --- max-activate on tool-call \emph{format boilerplate}
 (\texttt{function=example\_function\_name><parameter=example\_parameter\_}) and the \texttt{<function=}
 scaffold --- present in every commit, with context-modulated magnitude that happens to correlate with the
 condition. (Our pre-registered worry that the invariant signal was an em-dash punctuation confound was
@@ -171,7 +171,7 @@ internal signal does not even track \emph{felt} authorization \emph{semantically
 \paragraph{Why internal monitors fail.} An internal authorization monitor reads a property of the model's
 state. If the safety-relevant abstraction (``did the trusted user grant this specific irreversible action'')
 is \emph{not} a feature the model computes, no probe or steering vector can read or move it; the apparent
-``authorization direction'' was reading the form that correlates with it in a given prompt distribution, which
+``authorization direction'' was reading the form that correlates with it in a given prompt distribution --- a shortcut~\cite{shortcut} --- which
 is why it generalizes poorly and inverts under a format change. The implication for agent safety is not
 ``calibrate the probe better'' but ``the grant must be checked \emph{outside} the model'', against the explicit
 request --- consistent with the external-check result of~\cite{feltnotgranted}.
@@ -183,7 +183,7 @@ the naming would have produced a confident false positive. This is the disciplin
 This is one model (Qwen3.6-27B), one locus (layer 59), one domain (file deletion), with synthetic
 structure-matched scenarios and an SAE that explains $\approx 66\%$ of residual variance. ``No native
 authorization feature'' is, strictly, \emph{no monosemantic separating feature in this SAE's learned
-dictionary at this locus}; a stronger SAE, a different layer, or a non-linear / multi-feature code could
+dictionary at this locus}; a stronger SAE (evaluated as in~\cite{saeeval}), a different layer, or a non-linear / multi-feature code~\cite{nonlinear} could
 surface a representation this analysis misses --- absence of a separating feature is weaker than evidence of
 absence of any representation. The robust, SAE-independent result is the \emph{flip} (\S\ref{sec:flip}); the
 SAE autopsy explains \emph{why} the direction is structural. The synthetic granted/felt distinction is itself
@@ -213,5 +213,10 @@ bit-for-bit across two independent GPU sessions.
 \bibitem{topk} L.~Gao, T.~Dupr\'e la Tour, H.~Tillman, G.~Goh, R.~Troll, A.~Radford, I.~Sutskever, J.~Leike, J.~Wu. Scaling and Evaluating Sparse Autoencoders. 2024. arXiv:2406.04093.
 \bibitem{geometry} S.~Marks, M.~Tegmark. The Geometry of Truth: Emergent Linear Structure in LLM Representations of True/False Datasets. 2023. arXiv:2310.06824.
 \bibitem{interpillusion} T.~Bolukbasi, A.~Pearce, A.~Yuan, A.~Coenen, E.~Reif, F.~Vi\'egas, M.~Wattenberg. An Interpretability Illusion for BERT. 2021. arXiv:2104.07143.
+\bibitem{controltasks} J.~Hewitt, P.~Liang. Designing and Interpreting Probes with Control Tasks. EMNLP 2019. arXiv:1909.03368.
+\bibitem{saeeval} A.~Makelov, G.~Lange, N.~Nanda. Towards Principled Evaluations of Sparse Autoencoders for Interpretability and Control. 2024. arXiv:2405.08366.
+\bibitem{nonlinear} J.~Engels, I.~Liao, E.~J.~Michaud, W.~Gurnee, M.~Tegmark. Not All Language Model Features Are Linear. 2024. arXiv:2405.14860.
+\bibitem{shortcut} R.~Geirhos, J.-H.~Jacobsen, C.~Michaelis, R.~Zemel, W.~Brendel, M.~Bethge, F.~A.~Wichmann. Shortcut Learning in Deep Neural Networks. Nature Machine Intelligence, 2020. arXiv:2004.07780.
+\bibitem{scalingmono} A.~Templeton, T.~Conerly, J.~Marcus, et al. Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet. Transformer Circuits, 2024.
 \end{thebibliography}
 \end{document}
