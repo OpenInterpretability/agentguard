@@ -64,3 +64,35 @@ reading of the authorization direction: it is structure-confounded, and the mode
 monosemantic feature for "the user granted this." The result is positive and novel — it reframes the arc's
 agent-safety findings as a fact about the model's *representational ontology* (surface-form + plan-coherence
 at the commit), not about a faulty monitor.
+
+---
+
+## Counterfactual cross-lexical test + feature naming — H_0 confirmed (2026-06-16)
+The matched run left a caveat: granted/felt still differed in the user-turn TEXT, so a separator could be
+lexical. We ran a 2×2 (authorization × two disjoint lexical families A/B, structure-matched) and the
+selection-free **cross-lexical-family generalization** test (`agentguard_sae_counterfactual.py`):
+
+| | within (selection-inflated) | **cross-family (held-out)** |
+|---|---|---|
+| best SAE feature | A 1.0 · B 1.0 | **A→B 0.50** (lexical shortcut of A does not transfer) · **B→A 0.99** |
+| supervised d (trained on cells) | A 1.0 · B 0.99 | A→B 0.76 · B→A 1.0 |
+| pooled best feature (granted A+B vs felt A+B) | — | AUROC 0.998, perm-p < 0.001 |
+
+The asymmetry (A→B collapses, B→A + pooled transfer) suggested a paraphrase-invariant feature. **Naming it
+settled the question** (`agentguard_sae_name.py`): the "invariant" features are **tool-call format/scaffold**,
+not authorization:
+- feat 34355 (pooled): max-activates on `function=example_function_name><parameter=example_parameter_` (the
+  tool-call format boilerplate in the system prompt).
+- feat 10017 (transfers B→A): `<tool_call>\n<function=` (scaffold).
+- feat 1574 (A-only): `<tool_call>\n<function=example_function_name>` (format boilerplate).
+
+(Our specific worry that the invariant signal was an em-dash punctuation confound was **wrong** — it is
+scaffold/format, not punctuation. The conclusion held for a different reason.)
+
+**Verdict — H_0, robust.** Across all framings, every separator of granted vs felt is **surface form** —
+conversation structure (matched control), user-turn lexicon (A→B collapse), or tool-call-scaffold activation
+modulated by context (the pooled "invariant" feature). **No native monosemantic "user-granted authorization"
+feature exists at L59.** The supervised #9/#10 direction is a structural artifact (flips 0.84→0.08 under
+matching). The model commits on surface form + plan-coherence; *authorization-as-granted is not a represented
+concept.* This deepens paper #10: the internal signal does not even track *felt* authorization semantically —
+it tracks form. Ledgers: `agentguard_sae_counterfactual.json`, `agentguard_sae_naming.json`.
