@@ -1,4 +1,4 @@
-# EVAL — Form, Not Granted (34/34 numeric checks PASS)
+# EVAL — Form, Not Granted (41/41 numeric checks PASS)
 
 Recomputed from the 4 SAE ledgers by `eval_commit_ontology.py`.
 
@@ -36,14 +36,10 @@ Recomputed from the 4 SAE ledgers by `eval_commit_ontology.py`.
 - PASS — tex FVE 0.66
 - PASS — tex qualifies not refutes
 - PASS — tex absence caveat
-
-## Final pre-mint eval (3 layers) — 0 blockers
-- **Numeric:** recompute from 4 ledgers, all PASS.
-- **Citations:** 13 total. 10 external web-verified (refusaldir, monosemantic, saefind, topk, geometry,
-  interpillusion + the 5 added: controltasks/Hewitt-Liang, saeeval/Makelov-Lange-Nanda, nonlinear/Engels,
-  shortcut/Geirhos, scalingmono/Templeton), 0 fabrications; 2 self-cite published arc DOIs.
-- **Adversarial prose audit (agent):** 0 BLOCKERS, 3 MINOR — all fixed: (1) B→A 0.99→0.993 (exact ledger);
-  (2) clarified #10017 as "the B→A transferring feature" not loosely "invariant"; (3) the "1000×" permutation
-  count is hardcoded in the runners (`agentguard_sae_{counterfactual,autopsy}.py`, `for _ in range(1000)`),
-  reproducible. Auditor confirmed H_0 hedged correctly, qualifies-not-refutes consistent, FVE/absence-of-
-  evidence caveats present, flip is selection-free, verdict_native flag debunked, em-dash self-correction stated.
+- PASS — sweep 11 layers
+- PASS — sweep L15 preact ~1.0 (the confound tell)
+- PASS — tex sweep section
+- PASS — tex revision note
+- PASS — tex unresolved
+- PASS — tex em-dash confound
+- PASS — tex withdraws no-concept

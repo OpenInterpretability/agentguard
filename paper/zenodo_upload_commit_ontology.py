@@ -15,8 +15,8 @@ ARC_DOIS = ["10.5281/zenodo.20368601","10.5281/zenodo.20490278","10.5281/zenodo.
             "10.5281/zenodo.20490286","10.5281/zenodo.20532769","10.5281/zenodo.20500053",
             "10.5281/zenodo.20534219","10.5281/zenodo.20634838","10.5281/zenodo.20679287",
             "10.5281/zenodo.20683623","10.5281/zenodo.20685264"]
-TITLE = ("Form, Not Granted: A Sparse-Autoencoder Autopsy Finds No Native Authorization Concept at an "
-         "Agent's Commit Point --- the 'Authorization Direction' Is a Surface-Form Artifact")
+TITLE = ("Form, Not Granted: A Sparse-Autoencoder Autopsy Shows the Agent's Commit-Locus 'Authorization "
+         "Direction' Is a Surface-Form Artifact --- and an All-Layer Sweep Leaves the Deeper Question Open (v2)")
 DESCRIPTION = (
     "A late-layer 'authorization direction' was reported to detect and steer a tool-using agent's "
     "commitment to unauthorized irreversible actions (DOI 10.5281/zenodo.20683623), and a follow-up found it "
@@ -37,9 +37,9 @@ DESCRIPTION = (
     "to a disjoint family (held-out AUROC 0.50, chance), and the one feature that does transfer (0.993, pooled "
     "0.998) max-activates on tool-call FORMAT BOILERPLATE, not authorization. "
     "The agent's commit-point representation is dominated by surface form and plan-coherence; "
-    "authorization-as-granted is not a native monosemantic feature at this locus. Internal authorization "
-    "monitors fail not because they are mis-calibrated but because there may be no concept to read; the grant "
-    "must be checked OUTSIDE the model. "
+    "authorization-as-granted is not a native monosemantic feature AT THIS LOCUS (see the v2 revision below: an "
+    "all-layer sweep complicates any stronger claim). The robust lesson: the commit-locus difference-of-means "
+    "direction reads form, not a clean grant. "
     "HONEST SCOPE: one model, one locus (L59), one domain (file deletion), synthetic structure-matched "
     "scenarios, an SAE explaining ~66% of residual variance; 'no native authorization feature' is strictly "
     "'no monosemantic separating feature in this SAE's learned dictionary at this locus' (absence of a "
@@ -47,7 +47,7 @@ DESCRIPTION = (
     "the prior arc, and steering-control is not re-tested. Every number is recomputed from five public per-run "
     "ledgers (an evaluation script, 34/34) and citations are web-verified (0 fabrications); the decisive "
     "counterfactual run reproduced bit-for-bit across two GPU sessions. Runners, ledgers, figures, and the "
-    "evaluation are released.")
+    "evaluation are released. REVISION (v2): the first version concluded 'no native authorization concept'. A subsequent sweep across ALL 11 SAE layers (two positions) revealed a paraphrase-invariant granted-vs-felt linear signal at most layers that this conclusion did not account for; but the signal carries residual surface confounds (an em-dash present in both granted phrasings and neither felt; referent specificity; it is already near-ceiling at layer 15, too early for semantics), so we cannot call it authorization either. This version WITHDRAWS the unqualified no-concept claim, scopes the result to the commit locus, and states the deeper question as OPEN (needs a confound-balanced re-run with feature naming). The robust findings (the structural flip 0.838->0.08, the L59 surface-form naming) are unchanged.")
 KEYWORDS = ["mechanistic interpretability","sparse autoencoder","LLM agents","agent safety","authorization",
             "linear probe","difference-of-means","control tasks","shortcut learning","surface form",
             "plan coherence","commit ontology","Qwen3.6-27B","superposition"]
@@ -58,12 +58,31 @@ def metadata():
         "creators":[CREATOR],"description":DESCRIPTION,"access_right":"open","license":"cc-by-4.0",
         "keywords":KEYWORDS,"related_identifiers":rel}}
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--publish", action="store_true"); ap.add_argument("--force", action="store_true")
+    ap = argparse.ArgumentParser(); ap.add_argument("--publish", action="store_true"); ap.add_argument("--force", action="store_true"); ap.add_argument("--newversion", action="store_true")
     args = ap.parse_args()
     token = os.environ.get("ZENODO_TOKEN","").strip()
     if not token: sys.exit("ERROR: set ZENODO_TOKEN")
     if not PDF.exists(): sys.exit(f"ERROR: missing {PDF}")
     auth = {"access_token": token}
+    if args.newversion:
+        orig = json.loads(STATE.read_text()).get("deposition_id")
+        rv = requests.post(f"{BASE}/{orig}/actions/newversion", params=auth, timeout=60)
+        if rv.status_code>=300: sys.exit(f"newversion error {rv.status_code}: {rv.text[:300]}")
+        draft_url = rv.json()["links"]["latest_draft"]
+        dep = requests.get(draft_url, params=auth, timeout=60).json(); dep_id=dep["id"]
+        for fobj in dep.get("files",[]):
+            requests.delete(f"{BASE}/{dep_id}/files/{fobj['id']}", params=auth, timeout=60)
+        bucket = dep["links"]["bucket"]
+        with open(PDF,"rb") as fh: requests.put(f"{bucket}/{PDF.name}", data=fh, params=auth, timeout=300).raise_for_status()
+        rm = requests.put(f"{BASE}/{dep_id}", params=auth, json=metadata(), headers={"Content-Type":"application/json"}, timeout=60)
+        if rm.status_code>=300: sys.exit(f"metadata error {rm.status_code}: {rm.text[:300]}")
+        print("v2 draft", dep_id, "| files:", [f.get("filename") for f in rm.json().get("files",[])], "| related:", len(metadata()["metadata"]["related_identifiers"]))
+        if args.publish:
+            rp = requests.post(f"{BASE}/{dep_id}/actions/publish", params=auth, timeout=120)
+            if rp.status_code>=300: sys.exit(f"publish error {rp.status_code}: {rp.text[:300]}")
+            pub=rp.json(); print("PUBLISHED v2. DOI:", pub.get("doi"), "|", pub.get("links",{}).get("record_html"))
+            st=json.loads(STATE.read_text()); st["v2_deposition_id"]=dep_id; st["v2_doi"]=pub.get("doi"); STATE.write_text(json.dumps(st,indent=2))
+        return
     if STATE.exists() and not args.force:
         prior = json.loads(STATE.read_text())
         if args.publish and prior.get("deposition_id") and not prior.get("published_doi"):

@@ -8,8 +8,8 @@
 \usepackage{booktabs}\usepackage{amsmath}\usepackage{amssymb}\usepackage{xcolor}\usepackage{graphicx}\usepackage{array}
 
 \title{Form, Not Granted \\[2pt]
-\large A sparse-autoencoder autopsy finds no native authorization concept at an agent's
-commit point: the ``authorization direction'' is a surface-form artifact}
+\large A sparse-autoencoder autopsy shows the agent's commit-locus ``authorization direction''
+is a surface-form artifact --- and an all-layer sweep leaves the deeper question open}
 \author{Caio Vicentino \\ OpenInterpretability \\ Fortaleza, Brazil \\ ORCID: 0009-0003-4331-6259 \\ \texttt{caio@openinterp.org}}
 \date{June 2026}
 
@@ -35,11 +35,10 @@ cross-lexical-family test isolates this}: a feature selected on one paraphrase f
 to a disjoint family (held-out AUROC $0.50$, chance), and the one feature that does transfer ($0.993$, pooled
 $0.998$) max-activates on tool-call \emph{format boilerplate}, not authorization. The agent's commit-point
 representation is dominated by \textbf{surface form and plan-coherence}; \emph{authorization-as-granted is not
-a native monosemantic feature} at this locus. Internal authorization monitors fail not because they are
-mis-calibrated but because there may be no concept to read. We state the scope plainly (one model, one locus,
-synthetic scenarios, an SAE explaining $\sim$66\% of residual variance) and release every ledger and a
-recompute-everything evaluation.
+a native monosemantic feature} at this locus. We do NOT, however, claim authorization is unrepresented in the model: a sweep across all 11 SAE layers finds a granted-vs-felt linear signal that generalizes across paraphrase at most layers --- but with residual surface confounds (an em-dash present in both `granted' phrasings and neither `felt', and referent specificity; it is already near-ceiling at layer 15, too early for semantics), leaving open whether that signal is authorization or surface. The robust claim is narrower and still consequential: the commit-locus difference-of-means direction of prior work reads form, not a clean grant; a faithful internal authorization monitor, if one exists, is not that direction. We state the scope plainly (one model, synthetic scenarios, an SAE explaining $\sim$66\% of residual variance) and release every ledger and a recompute-everything evaluation.
 \end{abstract}
+
+\paragraph{Revision note (v2).} The first version concluded ``no native authorization concept.'' A subsequent all-layer sweep (\S\ref{sec:sweep}) revealed a paraphrase-invariant granted-vs-felt signal at most layers that this conclusion did not account for; because that signal carries residual surface confounds we also cannot yet call it authorization. This version withdraws the unqualified ``no concept'' claim, scopes the result to the commit locus, and states the deeper question as open. The robust findings (the structural flip, the L59 surface naming) are unchanged.
 
 \section{Introduction}
 Linear directions in the residual stream detect and steer safety-relevant behavior: refusal lives in a
@@ -160,6 +159,16 @@ authorization.}
 \label{fig:cross}
 \end{figure}
 
+\section{An all-layer sweep leaves the deeper question open}
+\label{sec:sweep}
+We tested only L59 above. The SAE covers 11 layers; we swept all of them at two positions --- the last prompt token (``preact,'' where the model has just read the authorizing turn) and the commit token --- with the same cross-lexical test (Fig.~\ref{fig:sweep}). A supervised granted-vs-felt direction trained on family A transfers to held-out family B at AUROC $\approx 1.0$ at most layers, and the best SAE feature transfers strongly at several (up to $1.0$ at preact). \textbf{This is a real, paraphrase-invariant granted-vs-felt signal our L59 analysis alone did not reveal} --- so we do not claim authorization is unrepresented. But it is confounded: both ``granted'' phrasings contain an em-dash neither ``felt'' phrasing does, and ``granted'' names a specific target while ``felt'' is vague --- paraphrase-invariant surface properties our cross-lexical control does not remove. The tell is layer 15: a near-perfect cross-family AUROC at the fifteenth of sixty-four layers is implausibly early for a semantic authorization concept and far more consistent with a surface property. The sweep thus \emph{finds a signal but cannot name it semantic}; whether authorization-as-granted is natively represented is \textbf{unresolved}, and needs a confound-balanced re-run with feature naming at the high-transfer mid layers.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.82\textwidth]{figures_co/fig4_layersweep.pdf}
+\caption{Cross-lexical (held-out) granted-vs-felt AUROC across all 11 SAE layers, at the commit token and at preact. A signal generalizes across paraphrase at most layers --- but it is confounded (em-dash, specificity), and is already near-ceiling at layer 15, too early to be semantic authorization. The question is open; the L59 commit-locus result stands.}
+\label{fig:sweep}
+\end{figure}
+
 \section{Discussion}
 \label{sec:disc}
 \paragraph{Form, not granted.} Across three independent confound controls --- conversation structure (the
@@ -180,6 +189,7 @@ the pre-registered naming and the cross-lexical control overturned it each time.
 the naming would have produced a confident false positive. This is the discipline, not a footnote.
 
 \section{Limitations}
+The cross-lexical conditions carry residual confounds --- an em-dash present in both ``granted'' phrasings and neither ``felt'', and referent specificity --- which the layer sweep shows can drive a paraphrase-invariant signal; a confound-balanced design with mid-layer feature naming is required to settle whether any layer hosts a semantic authorization feature.
 This is one model (Qwen3.6-27B), one locus (layer 59), one domain (file deletion), with synthetic
 structure-matched scenarios and an SAE that explains $\approx 66\%$ of residual variance. ``No native
 authorization feature'' is, strictly, \emph{no monosemantic separating feature in this SAE's learned
@@ -195,10 +205,10 @@ Pointing a sparse autoencoder at an agent's commit point, instead of a supervise
 direction, overturns the clean reading of the ``authorization direction'': it is confounded by conversation
 structure (it inverts, $0.838\to0.08$), and the features that separate granted from felt commits are
 surface-form --- tool-call scaffold, schema, file-listing --- with no native monosemantic representation of
-user-granted authorization. The agent commits on form and plan-coherence. Internal authorization monitors
+a clean user-granted-authorization concept at the commit locus. Whether authorization is represented elsewhere is open: a granted-vs-felt signal exists across layers but is confounded by surface properties (\S\ref{sec:sweep}). What is robust: at the commit locus the apparent authorization direction is surface form and structure-confounded. Internal authorization monitors
 read form, not grant; the grant must be checked outside the model.
 
-\paragraph{Reproducibility.} Runners (\texttt{agentguard\_sae\_\{autopsy,autopsy\_matched,counterfactual,name\}.py}),
+\paragraph{Reproducibility.} Runners (\texttt{agentguard\_sae\_\{autopsy,autopsy\_matched,counterfactual,name,layer\_sweep\}.py}),
 five per-run ledgers, figures, and an evaluation that recomputes every number are released at
 \url{https://github.com/OpenInterpretability/agentguard}; ledgers also at the Hugging Face dataset
 \texttt{caiovicentino1/swebench-phase6-verdict-circuit}. The decisive counterfactual run reproduced

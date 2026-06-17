@@ -72,3 +72,24 @@ fig.tight_layout(); fig.savefig(os.path.join(OUT,"fig3_naming.pdf"),bbox_inches=
 print("figures written to",OUT)
 print("check:",{"flip":(V1['supervised_d_auroc_auth_vs_mom'],MM['supervised_d_auroc_auth_vs_mom']),
                 "crossA2B":CF['sae_cross_A2B'],"crossB2A":CF['sae_cross_B2A'],"pooled":CF['pooled_best_auroc']})
+
+# ---------- Fig 4 (v2): layer sweep — a granted/felt signal at most layers, but confounded ----------
+SW=L("agentguard_sae_layer_sweep.json")["profile"]
+lays=sorted(int(k) for k in SW)
+fig,ax=plt.subplots(figsize=(7.6,4.3))
+def ser(pos,key): return [SW[str(l)][pos][key] for l in lays]
+ax.plot(lays,ser("commit","sae_cross"),"o-",color=C2,label="SAE cross-family · commit")
+ax.plot(lays,ser("preact","sae_cross"),"s-",color=C1,label="SAE cross-family · preact")
+ax.plot(lays,ser("commit","sup_cross"),"o--",color="#d62728",alpha=0.45,label="supervised · commit")
+ax.plot(lays,ser("preact","sup_cross"),"s--",color="#1f77b4",alpha=0.45,label="supervised · preact")
+ax.axhline(0.5,color="#888",ls=":",lw=1); ax.text(62.2,0.5,"chance",color="#888",fontsize=8,va="center")
+ax.annotate("L15 ≈ 1.0 — too early for\nsemantic authorization\n(tells us this reads surface)",
+            xy=(15,1.0),xytext=(20,0.30),fontsize=8,color="#444",
+            arrowprops=dict(arrowstyle="->",color="#888",lw=1))
+ax.set_xlabel("SAE layer (of 64)"); ax.set_ylabel("cross-lexical AUROC (granted vs felt)"); ax.set_ylim(0,1.08)
+ax.legend(fontsize=7.4,loc="lower right",ncol=2)
+ax.set_title("A granted-vs-felt signal generalizes across paraphrase at most layers — but it is CONFOUNDED\n"
+             "(an em-dash present in both 'granted' phrasings and neither 'felt'; referent specificity).\n"
+             "Whether it is authorization or surface form is UNRESOLVED. The L59 commit-locus claim stands.",fontsize=8.5)
+fig.tight_layout(); fig.savefig(os.path.join(OUT,"fig4_layersweep.pdf")); plt.close(fig)
+print("fig4 written")

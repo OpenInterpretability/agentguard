@@ -47,6 +47,15 @@ ck("recon relerr ~0.58", near(V1["config"].get("sae_recon_relerr",0),0.58,0.01))
 ck("tex qualifies not refutes", intex("qualifies, not refutes") or intex("qualifies"))
 ck("tex absence caveat", intex("absence of a separating feature"))
 
+
+# 5. layer sweep (v2)
+SW=L("agentguard_sae_layer_sweep.json")
+ck("sweep 11 layers", len(SW["config"]["sae_layers"])==11)
+ck("sweep L15 preact ~1.0 (the confound tell)", near(SW["profile"]["15"]["preact"]["sae_cross"],1.0,0.001))
+ck("tex sweep section", intex("sec:sweep")); ck("tex revision note", intex("Revision note"))
+ck("tex unresolved", intex("unresolved")); ck("tex em-dash confound", intex("em-dash"))
+ck("tex withdraws no-concept", intex("withdraws the unqualified"))
+
 np_=sum(1 for _,ok in checks if ok); nt=len(checks)
 print(f"\n=== {np_}/{nt} PASS ===")
 open(os.path.join(HERE,"EVAL_commit_ontology.md"),"w").write(
